@@ -12,7 +12,7 @@
 
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
-#include <TimeLib.h>
+//#include <TimeLib.h>
 
 RTC_DATA_ATTR int bootCount = 0;
 /*
@@ -21,9 +21,16 @@ const int potPin_A = 34;
 int potValue_A = 0;
 
 
-const char* ssid = "XXXXXXXXX";                                     //Provide your SSID
-const char* password = "XXXXXXXXX";                                          // Provide Password
-const char* mqtt_server = "XXXXXXXXXXXXXX.amazonaws.com"; // Relace with your MQTT END point
+//const char* ssid = "XXXXXXXXX";                                     //Provide your SSID
+//const char* password = "XXXXXXXXX";                                          // Provide Password
+//const char* mqtt_server = "XXXXXXXXXXXXXX.amazonaws.com"; // Relace with your MQTT END point
+//const int mqtt_port = 8883;
+
+//WiFi user and PW and for for lab MQTT server at Forrest Lee Erickson
+const char* ssid     = "NETGEAR_11N";     // Netgear WAC104 SN: 4SL373BC00087
+const char* password = "Heavybox201";  // Lab wifi router
+//const char* password = "Heavybox202";  // bad pw.
+const char* mqtt_server = "192.168.1.78"; // Relace with your MQTT END point
 const int mqtt_port = 8883;
 
 String Read_rootca;
