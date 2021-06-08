@@ -2,8 +2,15 @@
  * Lee Fader's code 20210607
  * MQTT test code
  * Processor ESP32
- * 
+ *  
+ *  Originaly inspired by code at: https://github.com/VeeruSubbuAmi/v2.0-Temperature-Data-record-on-AWS-IoT-Core-with-ESP32
  */
+
+//This code is bing thrashed uppon to try to investigate problems where the ESP32 did not go to sleep
+//20210607 Evidence that the MQTT client / broker connection failed.
+//Modified by Forrest Erickson for finite WiFi station connection attempts
+//Modified by Forrest Erickson for finite MQTT client connection attempts
+
 
 
 #include "SPIFFS.h"
@@ -49,6 +56,7 @@ int count = 1;
 WiFiClientSecure espClient;
 PubSubClient client(espClient);
 
+
 void setup_wifi() {
   delay(10);
   Serial.println();
@@ -57,10 +65,15 @@ void setup_wifi() {
 
   WiFi.begin(ssid, password);
 
-  while (WiFi.status() != WL_CONNECTED) {
+  // Loop until we're WiFi connected but only a maximum number of times
+  const int WIFI_MAX_ATTEMPTS = 5;
+  int wifiAttemptCount =0;
+  while ((WiFi.status() != WL_CONNECTED) & wifiAttemptCount++< WIFI_MAX_ATTEMPTS ) {
     delay(500);
     Serial.print(".");
-  }
+  }// end != WL_CONNECTED
+  Serial.print("wifiAttemptCount: ");
+  Serial.println(wifiAttemptCount);
 
   randomSeed(micros());
 
@@ -80,8 +93,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.println();
 }
 void reconnect() {
-  // Loop until we're reconnected
-  while (!client.connected()) {
+  // Loop until we're reconnected but only a maximum number of times
+  const int MQTT_MAX_ATTEMPTS = 5;
+  int mqttAttemptCount =0;
+  while (!client.connected() & (mqttAttemptCount++ < MQTT_MAX_ATTEMPTS ) ) {
+  //while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Create a random client ID
     String clientId = "ESP32-";
@@ -125,8 +141,10 @@ StaticJsonDocument<200> doc;
       // Wait 5 seconds before retrying
       delay(5000);
     }
-  }
-}
+  }// end while (!client.connected()
+  Serial.print("mqttAttemptCount: ");
+  Serial.println(mqttAttemptCount);
+}//end reconnect
 
 void setup() {
   Serial.begin(115200);
@@ -224,7 +242,8 @@ void setup() {
   WiFi.macAddress(mac);
   snprintf(mac_Id, sizeof(mac_Id), "%02x:%02x:%02x:%02x:%02x:%02x",
            mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-  Serial.print(mac_Id);
+  Serial.print("mac_Id: ");
+  Serial.println(mac_Id);
   //=====================================================================================================================
 
     if (!client.connected()) {
